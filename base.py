@@ -437,7 +437,6 @@ class MiBand2(Peripheral):
             # send ping request every 12 sec
             if (time.time() - t) >= 12:
                 char_ctrl.write(b'\x16', True)
-                t = time.time()
 
     def start_raw_data_realtime(self, heart_measure_callback=None, heart_raw_callback=None, accel_raw_callback=None):
         char_m = self.svc_heart.getCharacteristics(UUIDS.CHARACTERISTIC_HEART_RATE_MEASURE)[0]

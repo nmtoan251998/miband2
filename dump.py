@@ -22,6 +22,7 @@ while True:
         band = MiBand2(MAC, debug=True)
         band.setSecurityLevel(level="medium")
         band.authenticate()
+	# get heartRate data
         band.start_heart_rate_realtime(heart_measure_callback=log)
         band.disconnect()
     except BTLEException:

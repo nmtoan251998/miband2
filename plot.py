@@ -13,5 +13,7 @@ print (df.describe())
 # df.plot(kind='line')
 # plt.subplot('122')
 # df.plot(kind='histogram')
-df.rolling('120s').mean().plot()
+
+# Set time to start analytic data
+df.rolling('2s').mean().plot()
 plt.show()
