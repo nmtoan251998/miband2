@@ -416,6 +416,26 @@ class MiBand2(Peripheral):
         rate = struct.unpack('bb', res)[1]
         return rate
 
+    # our function to measure all arguments real-time
+    def get_all(self):
+        # get STEPS data
+        char = self.svc_1.getCharacteristics(UUIDS.CHARACTERISTIC_STEPS)[0]
+        #char_m = self.svc_heart.getCharacteristics(UUIDS.CHARACTERISTIC_HEART_RATE_MEASURE)[0]
+        #char_d = char_m.getDescriptors(forUUID=UUIDS.NOTIFICATION_DESCRIPTOR)[0]
+        #char_ctrl = self.svc_heart.getCharacteristics(UUIDS.CHARACTERISTIC_HEART_RATE_CONTROL)[0]
+
+        a = char.read()
+        steps = struct.unpack('h', a[1:3])[0] if len(a) >= 3 else None
+        meters = struct.unpack('h', a[5:7])[0] if len(a) >= 7 else None	
+        fat_gramms = struct.unpack('h', a[2:4])[0] if len(a) >= 4 else None
+
+        # why only 1 byte??
+        callories = struct.unpack('b', a[9:10])[0] if len(a) >= 10 else None
+
+        while True:            
+            self.waitForNotifications(0.5)
+            return a
+
     def start_heart_rate_realtime(self, heart_measure_callback):
         char_m = self.svc_heart.getCharacteristics(UUIDS.CHARACTERISTIC_HEART_RATE_MEASURE)[0]
         char_d = char_m.getDescriptors(forUUID=UUIDS.NOTIFICATION_DESCRIPTOR)[0]

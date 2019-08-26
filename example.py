@@ -12,6 +12,10 @@ parser.add_argument('-l', '--live',  action='store_true',help='Measures live hea
 parser.add_argument('-i', '--init',  action='store_true',help='Initializes the device')
 parser.add_argument('-m', '--mac', required=True, help='Mac address of the device')
 parser.add_argument('-t', '--set_current_time', action='store_true',help='Set time')
+
+# our arguments
+parser.add_argument('-nl', '--nienluan',  action='store_true',help='Measures the required params')
+
 args = parser.parse_args()
 
 MAC = args.mac # sys.argv[1]
@@ -77,5 +81,34 @@ if args.live:
             heart_measure_callback=l,
             heart_raw_callback=b,
             accel_raw_callback=f)
+
+# our lovely function to get all arguments
+if args.nienluan:    
+    print ('Message notif')
+    band.send_alert(ALERT_TYPES.MESSAGE)
+    time.sleep(3)
+
+    print ('Steps:', band.get_all())
+    
+    '''print ('Start counting fitness data')
+    band.send_alert(ALERT_TYPES.NONE)
+    print ('Battery:', band.get_battery_info())
+    print ('Time:', band.get_current_time())
+    print ('Steps:', band.get_steps())
+
+    band.start_raw_data_realtime(
+            heart_measure_callback=l,
+            heart_raw_callback=b,
+            accel_raw_callback=f)
+
+    t = time.time()
+        while True:
+            self.waitForNotifications(0.5)
+            self._parse_queue()
+            # send ping request every 12 sec
+            if (time.time() - t) >= 12:
+                char_ctrl.write(b'\x16', True)'''
+
+    
 
 band.disconnect()
