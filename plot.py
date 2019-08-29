@@ -15,5 +15,5 @@ print (df.describe())
 # df.plot(kind='histogram')
 
 # Set time to start analytic data
-df.rolling('2s').mean().plot()
+df.rolling('5s').mean().plot()
 plt.show()

@@ -393,7 +393,6 @@ class MiBand2(Peripheral):
             "meters": meters,
             "fat_gramms": fat_gramms,
             "callories": callories
-
         }
 
     def send_alert(self, _type):
@@ -414,27 +413,7 @@ class MiBand2(Peripheral):
             res = self._get_from_queue(QUEUE_TYPES.HEART)
 
         rate = struct.unpack('bb', res)[1]
-        return rate
-
-    # our function to measure all arguments real-time
-    def get_all(self):
-        # get STEPS data
-        char = self.svc_1.getCharacteristics(UUIDS.CHARACTERISTIC_STEPS)[0]
-        #char_m = self.svc_heart.getCharacteristics(UUIDS.CHARACTERISTIC_HEART_RATE_MEASURE)[0]
-        #char_d = char_m.getDescriptors(forUUID=UUIDS.NOTIFICATION_DESCRIPTOR)[0]
-        #char_ctrl = self.svc_heart.getCharacteristics(UUIDS.CHARACTERISTIC_HEART_RATE_CONTROL)[0]
-
-        a = char.read()
-        steps = struct.unpack('h', a[1:3])[0] if len(a) >= 3 else None
-        meters = struct.unpack('h', a[5:7])[0] if len(a) >= 7 else None	
-        fat_gramms = struct.unpack('h', a[2:4])[0] if len(a) >= 4 else None
-
-        # why only 1 byte??
-        callories = struct.unpack('b', a[9:10])[0] if len(a) >= 10 else None
-
-        while True:            
-            self.waitForNotifications(0.5)
-            return a
+        return rate    
 
     def start_heart_rate_realtime(self, heart_measure_callback):
         char_m = self.svc_heart.getCharacteristics(UUIDS.CHARACTERISTIC_HEART_RATE_MEASURE)[0]
@@ -470,35 +449,18 @@ class MiBand2(Peripheral):
         if accel_raw_callback:
             self.accel_raw_callback = accel_raw_callback
 
-        char_sensor = self.svc_1.getCharacteristics(UUIDS.CHARACTERISTIC_SENSOR)[0]
-        # char_sens_d = char_sensor1.getDescriptors(forUUID=UUIDS.NOTIFICATION_DESCRIPTOR)[0]
-
-        # char_sensor2 = self.svc_1.getCharacteristics('000000010000351221180009af100700')[0]
-        # char_sens_d2 = char_sensor2.getDescriptors(forUUID=UUIDS.NOTIFICATION_DESCRIPTOR)[0]
-
-        # char_sensor3 = self.svc_1.getCharacteristics('000000070000351221180009af100700')[0]
-        # char_sens_d3 = char_sensor3.getDescriptors(forUUID=UUIDS.NOTIFICATION_DESCRIPTOR)[0]
-
-        # char_sens_d1.write(b'\x01\x00', True)
-        # char_sens_d2.write(b'\x01\x00', True)
-        # char_sensor2.write(b'\x01\x03\x19')
-        # char_sens_d2.write(b'\x00\x00', True)
-        # char_d.write(b'\x01\x00', True)
-        # char_ctrl.write(b'\x15\x01\x01', True)
-        # char_sensor2.write(b'\x02')
+        char_sensor = self.svc_1.getCharacteristics(UUIDS.CHARACTERISTIC_SENSOR)[0]        
 
         # stop heart monitor continues & manual
         char_ctrl.write(b'\x15\x02\x00', True)
         char_ctrl.write(b'\x15\x01\x00', True)
-        # WTF
-        # char_sens_d1.write(b'\x01\x00', True)
+
         # enabling accelerometer & heart monitor raw data notifications
         char_sensor.write(b'\x01\x03\x19')
         # IMO: enablee heart monitor notifications
         char_d.write(b'\x01\x00', True)
         # start hear monitor continues
         char_ctrl.write(b'\x15\x01\x01', True)
-        # WTF
         char_sensor.write(b'\x02')
         t = time.time()
         while True:

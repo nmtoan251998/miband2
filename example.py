@@ -57,7 +57,7 @@ if args.standard:
     print ('Time:', band.get_current_time())
     print ('Steps:', band.get_steps())
     print ('Heart rate oneshot:', band.get_heart_rate_one_time())
-   
+
 if args.set_current_time:
     now = datetime.now()
     print ('Set time to:', now)
@@ -65,7 +65,7 @@ if args.set_current_time:
     print ('Time:', band.get_current_time())
 
 def l(x):
-    print ('Realtime heart:', x)
+    print ('Realtime heartrate:', x)
 
 
 def b(x):
@@ -84,31 +84,60 @@ if args.live:
 
 # our lovely function to get all arguments
 if args.nienluan:    
-    print ('Message notif')
+    print ('Message notification sent!')
     band.send_alert(ALERT_TYPES.MESSAGE)
     time.sleep(3)
 
-    print ('Steps:', band.get_all())
-    
-    '''print ('Start counting fitness data')
-    band.send_alert(ALERT_TYPES.NONE)
-    print ('Battery:', band.get_battery_info())
-    print ('Time:', band.get_current_time())
-    print ('Steps:', band.get_steps())
-
-    band.start_raw_data_realtime(
-            heart_measure_callback=l,
-            heart_raw_callback=b,
-            accel_raw_callback=f)
+    #f = open("./logfile1.txt", "a")
+    #f.write("Message notification sent!\n")    
+    #f.write("Start counting realtime data!\n")    
 
     t = time.time()
-        while True:
-            self.waitForNotifications(0.5)
-            self._parse_queue()
-            # send ping request every 12 sec
-            if (time.time() - t) >= 12:
-                char_ctrl.write(b'\x16', True)'''
+    while True:                
+        time.sleep(1)
+        heart_rate = band.our_get_heart_rate_one_time()
+        steps = band.our_get_all()['steps']
+        fat_gramms = band.our_get_all()['fat_gramms']
+        meters = band.our_get_all()['meters']
+        callories = band.our_get_all()['callories']     
+        #heart_rate = band.get_data_realtime()['heart_rate']  
 
-    
+        print ('Heart rate:', heart_rate)
+        print ('Steps:', steps)
+        print ('Fat grams:', fat_gramms)
+        print ('Meters:', meters)
+        print ('Callories consumption:', callories)
+        
+        # send ping request every 12 sec
+        if (time.time() - t) >= 6:
+            '''f.write('Time: ' + time.asctime( time.localtime(time.time()) ) 
+            + ' - Heart rate: ' + str(heart_rate) 
+            + ' - Steps: ' + str(steps) 
+            + ' - Fat gramms: ' + str(fat_gramms) 
+            + ' - Meters: ' + str(meters) 
+            + ' - Callories consumption: ' + str(callories) 
+            + '\n')'''
+            #print ('Write data')                        
+
+            band._char_heart_ctrl.write(b'\x16', True)   
+            t = time.time()                
 
 band.disconnect()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

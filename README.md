@@ -17,11 +17,17 @@ sudo hcitool lescan
 ```sh
 python example.py --mac MAC_ADDRESS --init
 ```
-6) Run this to call demo functions
+6.1) Run this to call demo functions
 ```sh
 python example.py --standard --mac MAC_ADDRESS
 python example.py --help
 ```
+
+6.2) Project script
+``` sh
+python3 example.py --nienluan --mac MAC_ADDRESS
+```
+
 7) If you having problems(BLE can glitch sometimes) try this and repeat from 4)
 ```sh
 sudo hciconfig hci0 reset
