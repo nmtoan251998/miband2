@@ -3,6 +3,8 @@ import time
 import logging
 from datetime import datetime, timedelta
 from Crypto.Cipher import AES
+
+import sys
 try:
     from Queue import Queue, Empty
 except ImportError:
@@ -437,7 +439,7 @@ class MiBand2(Peripheral):
             if (time.time() - t) >= 12:
                 char_ctrl.write(b'\x16', True)
 
-    def start_raw_data_realtime(self, heart_measure_callback=None, heart_raw_callback=None, accel_raw_callback=None):
+    def start_raw_data_realtime(self, heart_measure_callback=None, heart_raw_callback=None, accel_raw_callback=None):        
         char_m = self.svc_heart.getCharacteristics(UUIDS.CHARACTERISTIC_HEART_RATE_MEASURE)[0]
         char_d = char_m.getDescriptors(forUUID=UUIDS.NOTIFICATION_DESCRIPTOR)[0]
         char_ctrl = self.svc_heart.getCharacteristics(UUIDS.CHARACTERISTIC_HEART_RATE_CONTROL)[0]
@@ -464,7 +466,8 @@ class MiBand2(Peripheral):
         char_sensor.write(b'\x02')
         t = time.time()
         while True:
-            self.waitForNotifications(0.5)
+            sys.stdout.flush()
+            self.waitForNotifications(0.1)
             self._parse_queue()
             # send ping request every 12 sec
             if (time.time() - t) >= 12:

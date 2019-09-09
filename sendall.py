@@ -2,7 +2,11 @@ import sys
 import time
 import argparse
 import requests
+import json
+import csv
+from pathlib import Path
 from datetime import datetime
+from time import sleep
 from base import MiBand2
 from constants import ALERT_TYPES
 
@@ -18,6 +22,10 @@ MAC = args.mac # sys.argv[1]
 band = MiBand2(MAC, debug=True)
 band.setSecurityLevel(level="medium")
 
+fitness_data = []
+path_to_file = '../../assets/data/'
+file_name_to_save_to_db = MAC + time.strftime("_%d_%m_%Y")
+
 if  args.init:
     if band.initialize():
         print("Init OK")
@@ -27,54 +35,52 @@ if  args.init:
 else:
     band.authenticate()
 
-def sendHeartrateDataToServer(heartrate):    
+def writeRealtimeData(heartrate):    
+
     data = {
         'heart_rate': heartrate,
         'steps': band.get_steps()['steps'],
         'fat_gramms': band.get_steps()['fat_gramms'],
         'meters': band.get_steps()['meters'],
-        'callories': band.get_steps()['callories']
-    }        
-    serverURL = "http://localhost:5000/data/live"
-    requests.post(serverURL, json = data)
+        'callories': band.get_steps()['callories'],
+        'time': time.strftime("%H:%M:%S")    
+    }            
+
+    with open(path_to_file + 'python_data.json', 'w') as json_file:
+        json.dump(data, json_file, indent=4)
+    
+    # data to backup and saved to database later
+    fitness_data.append(data)
+    with open(path_to_file + file_name_to_save_to_db + '.json', 'w') as json_file:
+        json.dump(fitness_data, json_file, indent=4)    
+
+    # this print is required to flush data to nodejs server
+    print(data)
 
 def l(x):
     print ('Heart rate:', x)
 
 def b(x):
     print ('Raw heart:', x)
-
-
+    
 def f(x):
     print ('Raw accel heart:', x)
 
-if args.live:    
+if args.live:
     band.send_alert(ALERT_TYPES.MESSAGE)
+
+    # read old data
+    try:
+        f = open(path_to_file + file_name_to_save_to_db + '.json', 'r')
+        old_data = json.loads(f.read())
+        fitness_data = old_data
+        f.close()
+    except IOError:
+        print('Created new data file')
     
     band.start_raw_data_realtime(
-            heart_measure_callback=sendHeartrateDataToServer,
+            heart_measure_callback=writeRealtimeData,
             heart_raw_callback=b,
             accel_raw_callback=f)
 
 band.disconnect()
-
-
-
-
-POST /data/live 200 0.316 ms - 3
-{ heart_rate: 119, steps: 1268, fat_gramms: 4, meters: 796, callories: 25 }
-
-POST /data/live 200 0.935 ms - 3
-{ heart_rate: 118, steps: 1279, fat_gramms: 4, meters: 796, callories: 25 }
-
-POST /data/live 200 0.828 ms - 3
-{ heart_rate: 116, steps: 1281, fat_gramms: 5, meters: 796, callories: 25 }
-
-POST /data/live 200 0.821 ms - 3
-{ heart_rate: 115, steps: 1285, fat_gramms: 5, meters: 833, callories: 26 }
-
-POST /data/live 200 0.836 ms - 3
-{ heart_rate: 114, steps: 1287, fat_gramms: 5, meters: 833, callories: 26 }
-
-POST /data/live 200 0.297 ms - 3
-{ heart_rate: 112, steps: 1288, fat_gramms: 5, meters: 833, callories: 26 }
