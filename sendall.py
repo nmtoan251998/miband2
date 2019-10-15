@@ -147,13 +147,11 @@ if args.live:
         pass
             
     if args.diagnose:
-        print('diagnose')
         band.start_raw_data_realtime(
                 heart_measure_callback=withDiagnose,
                 heart_raw_callback=b,
                 accel_raw_callback=f)
     else:
-        print('without diagnose')
         band.start_raw_data_realtime(
                 heart_measure_callback=withoutDiagnose,
                 heart_raw_callback=b,
