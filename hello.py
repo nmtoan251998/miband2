@@ -1,1 +1,5 @@
-print('hello from python')
+import sys
+
+sys.stdout.flush()
+
+print('hello world')

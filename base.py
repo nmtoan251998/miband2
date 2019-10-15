@@ -466,7 +466,9 @@ class MiBand2(Peripheral):
         char_sensor.write(b'\x02')
         t = time.time()
         while True:
+            # flush buffer data out
             sys.stdout.flush()
+
             self.waitForNotifications(0.1)
             self._parse_queue()
             # send ping request every 12 sec
