@@ -145,17 +145,11 @@ if args.live:
     except IOError:        
         print (IOError)
         pass
-            
+                       
     if args.diagnose:
-        band.start_raw_data_realtime(
-                heart_measure_callback=withDiagnose,
-                heart_raw_callback=b,
-                accel_raw_callback=f)
+        band.start_raw_data_realtime(heart_measure_callback=withDiagnose)
     else:
-        band.start_raw_data_realtime(
-                heart_measure_callback=withoutDiagnose,
-                heart_raw_callback=b,
-                accel_raw_callback=f)
+        band.start_raw_data_realtime(heart_measure_callback=withoutDiagnose)
 
 
 band.disconnect()

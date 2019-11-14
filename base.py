@@ -439,17 +439,13 @@ class MiBand2(Peripheral):
             if (time.time() - t) >= 12:
                 char_ctrl.write(b'\x16', True)
 
-    def start_raw_data_realtime(self, heart_measure_callback=None, heart_raw_callback=None, accel_raw_callback=None):        
+    def start_raw_data_realtime(self, heart_measure_callback=None):        
         char_m = self.svc_heart.getCharacteristics(UUIDS.CHARACTERISTIC_HEART_RATE_MEASURE)[0]
         char_d = char_m.getDescriptors(forUUID=UUIDS.NOTIFICATION_DESCRIPTOR)[0]
         char_ctrl = self.svc_heart.getCharacteristics(UUIDS.CHARACTERISTIC_HEART_RATE_CONTROL)[0]
 
         if heart_measure_callback:
             self.heart_measure_callback = heart_measure_callback
-        if heart_raw_callback:
-            self.heart_raw_callback = heart_raw_callback
-        if accel_raw_callback:
-            self.accel_raw_callback = accel_raw_callback
 
         char_sensor = self.svc_1.getCharacteristics(UUIDS.CHARACTERISTIC_SENSOR)[0]        
 
